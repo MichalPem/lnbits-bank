@@ -1,4 +1,4 @@
-package cz.mipemco.lnbitsbank.api;
+package cz.mipemco.lnbitsbank.dto;
 
 public class WalletDetailsDto {
 

@@ -1,25 +1,23 @@
 package cz.mipemco.lnbitsbank.api;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.mipemco.lnbitsbank.dto.UserApiKeysDto;
+import cz.mipemco.lnbitsbank.dto.UserDetailsDto;
+import cz.mipemco.lnbitsbank.dto.WalletDetailsDto;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Scanner;
+import java.util.List;
 
 @Component
-@ConfigurationProperties(prefix = "app.datasource")
+//@ConfigurationProperties(prefix = "app.datasource")
 public class LnbitsApi {
 
     @Value("${app.lnbits.host:}")
@@ -29,6 +27,7 @@ public class LnbitsApi {
 
     public static final String BASE_URL = "/wallet";
     public static final String WALLET_DETAILS = "/api/v1/wallet";
+    public static final String USERS_DETAILS = "/usermanager/api/v1/users";
 
     public LnbitsApi(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
@@ -63,6 +62,17 @@ public class LnbitsApi {
     public WalletDetailsDto getWalletDetails(UserApiKeysDto userApiKeys) throws Exception {
         try {
             return objectMapper.readValue(readUrl(lnbitsHost+WALLET_DETAILS,"GET",userApiKeys.invReadKey),WalletDetailsDto.class);
+        } catch (IOException e) {
+            throw new Exception("Unable to read user wallet details",e);
+        }
+    }
+
+    public List<UserDetailsDto> getUsersDetails(UserApiKeysDto userApiKeys) throws Exception {
+        try {
+            return objectMapper
+                    .readValue(
+                            readUrl(lnbitsHost+USERS_DETAILS,"GET",userApiKeys.invReadKey),
+                            new TypeReference<List<UserDetailsDto>>(){});
         } catch (IOException e) {
             throw new Exception("Unable to read user wallet details",e);
         }

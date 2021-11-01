@@ -2,7 +2,7 @@ package cz.mipemco.lnbits;
 
 import cz.mipemco.lnbitsbank.ApplicationConfiguration;
 import cz.mipemco.lnbitsbank.api.LnbitsApi;
-import cz.mipemco.lnbitsbank.api.WalletDetailsDto;
+import cz.mipemco.lnbitsbank.dto.WalletDetailsDto;
 import cz.mipemco.lnbitsbank.dto.UserApiKeysDto;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
