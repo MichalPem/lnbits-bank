@@ -1,6 +1,7 @@
 package cz.mipemco.lnbitsbank.dto;
 
-public class WalletDetailsDto {
+public class WalletDto
+{
 
     public String id;
     public String name;

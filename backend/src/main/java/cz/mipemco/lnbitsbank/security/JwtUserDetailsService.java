@@ -1,8 +1,7 @@
 package cz.mipemco.lnbitsbank.security;
 
-import cz.mipemco.lnbitsbank.api.LnbitsApi;
 import cz.mipemco.lnbitsbank.dao.UserDao;
-import cz.mipemco.lnbitsbank.dto.UserDetailsDto;
+import cz.mipemco.lnbitsbank.dto.UserDto;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,7 +28,7 @@ public class JwtUserDetailsService implements UserDetailsService
 
 	@Override public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException
 	{
-		UserDetailsDto u = userDao.getUserByName(s);
+		UserDto u = userDao.getUserByName(s);
 		if(u!=null)
 		{
 			return new User(u.name,u.password, Collections.singletonList(new SimpleGrantedAuthority("USER")));

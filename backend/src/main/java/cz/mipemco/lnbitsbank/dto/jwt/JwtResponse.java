@@ -1,4 +1,4 @@
-package cz.mipemco.lnbitsbank.dto;
+package cz.mipemco.lnbitsbank.dto.jwt;
 
 /**
  * @author Michal Pemčák

@@ -3,7 +3,7 @@ package cz.mipemco.lnbitsbank.dto;
 /**
  * @author Michal Pemčák
  */
-public class UserDetailsDto
+public class UserDto
 {
 	public String admin;
 	public String email;

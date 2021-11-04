@@ -2,9 +2,7 @@ package cz.mipemco.lnbitsbank.api;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import cz.mipemco.lnbitsbank.dto.UserApiKeysDto;
-import cz.mipemco.lnbitsbank.dto.UserDetailsDto;
-import cz.mipemco.lnbitsbank.dto.WalletDetailsDto;
+import cz.mipemco.lnbitsbank.dto.*;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -14,7 +12,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 //@ConfigurationProperties(prefix = "app.datasource")
@@ -26,8 +26,9 @@ public class LnbitsApi {
     private final ObjectMapper objectMapper;
 
     public static final String BASE_URL = "/wallet";
-    public static final String WALLET_DETAILS = "/api/v1/wallet";
-    public static final String USERS_DETAILS = "/usermanager/api/v1/users";
+    public static final String WALLET = "/api/v1/wallet";
+    public static final String USERS = "/usermanager/api/v1/users";
+    public static final String PAYMENTS = "/api/v1/payments";
 
     public LnbitsApi(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
@@ -59,33 +60,70 @@ public class LnbitsApi {
         throw new Exception("Unable to login for user");
     }
 
-    public WalletDetailsDto getWalletDetails(UserApiKeysDto userApiKeys) throws Exception {
+    public WalletDto getWallet(UserApiKeysDto userApiKeys) throws Exception {
         try {
-            return objectMapper.readValue(readUrl(lnbitsHost+WALLET_DETAILS,"GET",userApiKeys.invReadKey),WalletDetailsDto.class);
+            return objectMapper.readValue(readUrl(lnbitsHost+ WALLET,"GET",userApiKeys.invReadKey), WalletDto.class);
         } catch (IOException e) {
             throw new Exception("Unable to read user wallet details",e);
         }
     }
 
-    public List<UserDetailsDto> getUsersDetails(UserApiKeysDto userApiKeys) throws Exception {
+    public InvoiceResponse createInvoice(UserApiKeysDto userApiKeys, InvoiceRequestDto invoiceRequest) throws Exception {
+        try {
+            invoiceRequest.out = false;
+            return objectMapper.readValue(readUrl(lnbitsHost+ PAYMENTS,"POST",userApiKeys.invReadKey,objectMapper
+                    .writeValueAsString(invoiceRequest)), InvoiceResponse.class);
+        } catch (IOException e) {
+            throw new Exception("Unable to read user wallet details",e);
+        }
+    }
+
+    public List<UserDto> getUsers(UserApiKeysDto userApiKeys) throws Exception {
         try {
             return objectMapper
                     .readValue(
-                            readUrl(lnbitsHost+USERS_DETAILS,"GET",userApiKeys.invReadKey),
-                            new TypeReference<List<UserDetailsDto>>(){});
+                            readUrl(lnbitsHost+ USERS,"GET",userApiKeys.invReadKey),
+                            new TypeReference<List<UserDto>>(){});
+        } catch (IOException e) {
+            throw new Exception("Unable to read user wallet details",e);
+        }
+    }
+
+    public List<PaymentDto> getPayments(UserApiKeysDto userApiKeys) throws Exception {
+        try {
+            List<List<Object>>  ret  = objectMapper
+                    .readValue(readUrl(lnbitsHost+PAYMENTS,"GET",userApiKeys.invReadKey),
+                            new TypeReference<List<List<Object>>>(){});
+            return ret.stream().map(v -> {
+                PaymentDto t = new PaymentDto();
+                t.amount = (Integer) v.get(2);
+                t.memo = (String) v.get(4);
+                t.date = new Date((((Integer)(v.get(5)))*1000L));
+                t.pending = ((Integer)v.get(1))==1;
+                return t;
+            }).collect(Collectors.toList());
         } catch (IOException e) {
             throw new Exception("Unable to read user wallet details",e);
         }
     }
 
     private String readUrl(String url,String method,String apiKey) throws IOException {
-      Connection.Response r= Jsoup.connect(url)
+        return readUrl(url,method,apiKey,null);
+    }
+    private String readUrl(String url,String method,String apiKey,String body) throws IOException {
+      Connection d = Jsoup.connect(url)
                 .header("X-Api-Key", apiKey)
                 .ignoreHttpErrors(true)
                 .ignoreContentType(true)
-                .method(Connection.Method.valueOf(method)).execute();
-
-        return  r.body();
+                .method(Connection.Method.valueOf(method));
+      if(body!=null)
+      {
+          d.requestBody(body);
+          d.header("Content-type","application/json");
+      }
+      Connection.Response r= d.execute();
+      if(r.statusCode() > 205) throw new IOException(r.statusCode() + " " + r.statusMessage());
+      return  r.body();
 
     }
 

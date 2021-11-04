@@ -1,10 +1,11 @@
 <template>
-    <div id="login" class="fade-enter-active fade-enter-to">
-      <LoginMenu />
-      <input type="text" name="username" v-model="input.username" placeholder="Username" required/><br>
-      <input type="password" name="password" v-model="input.password" placeholder="Password" required/><br>
-      <button class="login_button" type="button" v-on:click="login()">Send</button>
-    </div>
+  <div id="login">
+    <LoginMenu />
+    <input type="text" name="username" v-model="input.username" placeholder="Username" required/><br>
+    <input type="password" name="password" v-model="input.password" placeholder="Password" required/><br>
+    <input type="email" name="email" v-model="input.email" placeholder="Email" /><br>
+    <button class="login_button" type="button" v-on:click="login()">Send</button>
+  </div>
 </template>
 
 <script>
@@ -21,7 +22,8 @@ export default {
     return {
       input: {
         username: "",
-        password: ""
+        password: "",
+        email: "",
       },
       username: ""
     }

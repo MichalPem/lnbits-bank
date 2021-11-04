@@ -1,12 +1,9 @@
 package cz.mipemco.lnbitsbank.rest;
 
-import java.util.Objects;
-
-import cz.mipemco.lnbitsbank.dto.JwtRequest;
-import cz.mipemco.lnbitsbank.dto.JwtResponse;
+import cz.mipemco.lnbitsbank.dto.jwt.JwtRequest;
+import cz.mipemco.lnbitsbank.dto.jwt.JwtResponse;
 import cz.mipemco.lnbitsbank.security.JwtTokenUtil;
 import cz.mipemco.lnbitsbank.security.JwtUserDetailsService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;

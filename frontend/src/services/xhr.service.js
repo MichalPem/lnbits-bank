@@ -2,6 +2,7 @@ import axios from "axios";
 
 class XHR {
     state = null
+    baseURL = "http://localhost:8080"
     setState(s)
     {
         this.state = s;
@@ -9,7 +10,7 @@ class XHR {
     login(username,password,callback)
     {
         this.state.requestActive = true;
-        axios.post("/api/login",{
+        axios.post(this.baseURL+"/api/login",{
             username:username,
             password:password
         }).then((response)=> {
@@ -20,14 +21,15 @@ class XHR {
     getUser(token,callback)
     {
         this.state.requestActive = true;
-        axios({
-            method: 'get',
-            url: "/api/user",
-            headers: {
-                Authorization: 'Bearer ' + token
-            }
-        }).then((r)=>{ this.state.requestActive = false;callback(r)})
+        axios.get(this.baseURL+"/api/user", { headers: { Authorization: 'Bearer ' + token } })
+            .then((r)=>{ this.state.requestActive = false;callback(r)})
+    }
 
+    getInvoice(token,data,callback)
+    {
+        this.state.requestActive = true;
+        axios.post(this.baseURL+"/api/invoice", data,{ headers: { Authorization: 'Bearer ' + token } })
+            .then((r)=>{ this.state.requestActive = false;callback(r)})
     }
 }
 export default new XHR();
